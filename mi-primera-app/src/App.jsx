@@ -2,10 +2,13 @@
 // IMPORTACIONES
 // ===============================
 
+// Importamos React Hook para estado
+import { useState } from "react";
+
 // Importamos el componente reutilizable
 import ProfileCard from "./components/ProfileCard";
 
-// Importamos la imagen desde assets
+// Importamos la imagen
 import perfil from "./assets/perfil.jpg";
 
 
@@ -16,10 +19,8 @@ import perfil from "./assets/perfil.jpg";
 function App() {
 
   // ===============================
-  // ARRAY DE DATOS (tareas)
+  // ARRAY DE TAREAS
   // ===============================
-  // Esto es información que luego vamos a mostrar en pantalla
-
   const tareas = [
     "Aprender React",
     "Estudiar JavaScript",
@@ -27,48 +28,50 @@ function App() {
     "Trabajar en proyectos"
   ];
 
+  // ===============================
+  // ESTADO DEL CONTADOR
+  // ===============================
+  // contador → valor actual
+  // setContador → función para actualizarlo
+  const [contador, setContador] = useState(0);
+
 
   // ===============================
-  // RETURN (LO QUE SE VE EN PANTALLA)
+  // RETURN (INTERFAZ)
   // ===============================
-
   return (
 
-    // Contenedor principal centrado
+    // Contenedor principal
     <div style={{
       display: "flex",
-      flexDirection: "column", // importante para poner elementos en columna
-      justifyContent: "center",
+      flexDirection: "column",
       alignItems: "center",
-      height: "100vh",
-      backgroundColor: "#f5f5f5"
+      backgroundColor: "#f5f5f5",
+      minHeight: "100vh",
+      padding: "40px"
     }}>
 
 
       {/* ===============================
-          SECCIÓN TARJETAS (COMPONENTES)
+          TARJETAS
       =============================== */}
-
       <div style={{
         display: "flex",
-        gap: "20px" // espacio entre tarjetas
+        gap: "20px"
       }}>
 
-        {/* Tarjeta 1 */}
         <ProfileCard 
           nombre="Hector"
           profesion="Frontend Developer"
           foto={perfil}
         />
 
-        {/* Tarjeta 2 */}
         <ProfileCard 
           nombre="Juan"
           profesion="Backend Developer"
           foto={perfil}
         />
 
-        {/* Tarjeta 3 */}
         <ProfileCard 
           nombre="Maria"
           profesion="UI Designer"
@@ -79,37 +82,75 @@ function App() {
 
 
       {/* ===============================
-          SECCIÓN LISTA DE TAREAS
+          LISTA DE TAREAS
       =============================== */}
-
       <div style={{ marginTop: "40px" }}>
 
-        <h2>Lista de tareas</h2>
+        <h2 style={{ textAlign: "center" }}>
+          Lista de tareas
+        </h2>
 
         <ul style={{
-  listStyle: "none",
-  padding: 0,
-  width: "300px"
-}}>
+          listStyle: "none",
+          padding: 0,
+          width: "300px"
+        }}>
 
-  {tareas.map((tarea, index) => (
+          {/* Recorremos el array con map */}
+          {tareas.map((tarea, index) => (
 
-    <li 
-      key={index}
-      style={{
-        backgroundColor: "white",
-        padding: "10px",
-        marginBottom: "10px",
-        borderRadius: "5px",
-        boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
-      }}
-    >
-      {tarea}
-    </li>
+            <li 
+              key={index}
+              style={{
+                backgroundColor: "white",
+                padding: "10px",
+                marginBottom: "10px",
+                borderRadius: "5px",
+                boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
+              }}
+            >
+              {tarea}
+            </li>
 
-  ))}
+          ))}
 
-</ul>
+        </ul>
+
+      </div>
+
+
+      {/* ===============================
+          CONTADOR (INTERACTIVO)
+      =============================== */}
+      <div style={{ marginTop: "40px", textAlign: "center" }}>
+
+        <h2>Contador</h2>
+
+        {/* Valor dinámico */}
+        <h1>{contador}</h1>
+
+        {/* Botón sumar */}
+        <button 
+          onClick={() => setContador(contador + 1)}
+        >
+          +
+        </button>
+
+        {/* Botón restar */}
+        <button 
+          onClick={() => setContador(contador - 1)}
+          style={{ marginLeft: "10px" }}
+        >
+          -
+        </button>
+
+        <button onClick={() => setContador(0)} style={{ marginLeft: "10px"}}>
+
+          Reset
+
+        </button>
+      
+       
 
       </div>
 
@@ -118,5 +159,5 @@ function App() {
 }
 
 
-// Exportamos el componente principal
+// Exportación del componente
 export default App;
