@@ -1,25 +1,30 @@
 // ===============================
 // IMPORTACIONES
 // ===============================
-
-// Hook de React para manejar estado dinámico
-import { useState } from "react";
-
-// Componente reutilizable
+import { useState, useEffect } from "react";
 import ProfileCard from "./components/ProfileCard";
-
-// Imagen local
 import perfil from "./assets/perfil.jpg";
 
 
 // ===============================
 // COMPONENTE PRINCIPAL
 // ===============================
-
 function App() {
 
   // ===============================
-  // ARRAY DE TAREAS (DATOS FIJOS)
+  // 🔵 ESTADOS API
+  // ===============================
+  const [usuarios, setUsuarios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [errorFetch, setErrorFetch] = useState(null); // 🔥 nuevo (manejo de error)
+
+  // ===============================
+  // 🟡 ESTADO HORA
+  // ===============================
+  const [hora, setHora] = useState(new Date());
+
+  // ===============================
+  // DATOS FIJOS
   // ===============================
   const tareas = [
     "Aprender React",
@@ -29,28 +34,50 @@ function App() {
   ];
 
   // ===============================
-  // ESTADO CONTADOR (DÍA 4)
+  // ESTADOS UI
   // ===============================
-  // contador → valor actual
-  // setContador → función que lo actualiza
   const [contador, setContador] = useState(0);
-
-  // ===============================
-  // 🟡 ESTADO INPUT (DÍA 5)
-  // ===============================
-  // nombre → guarda lo que el usuario escribe
-  // setNombre → actualiza ese valor en tiempo real
   const [nombre, setNombre] = useState("");
-
-  // ===============================
-  // 🟡 ESTADO ERROR (VALIDACIÓN)
-  // ===============================
-  // error → guarda mensaje si algo está mal
   const [error, setError] = useState("");
 
+  // ===============================
+  // 🟡 RELOJ
+  // ===============================
+  useEffect(() => {
+
+    const intervalo = setInterval(() => {
+      setHora(new Date());
+    }, 1000);
+
+    return () => clearInterval(intervalo);
+
+  }, []);
 
   // ===============================
-  // INTERFAZ (UI)
+  // 🔵 FETCH API (MEJORADO)
+  // ===============================
+  useEffect(() => {
+
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error al cargar usuarios");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setUsuarios(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setErrorFetch(error.message);
+        setLoading(false);
+      });
+
+  }, []);
+
+  // ===============================
+  // UI
   // ===============================
   return (
 
@@ -63,147 +90,94 @@ function App() {
       padding: "40px"
     }}>
 
-
-      {/* ===============================
-          TARJETAS (DÍA 2)
-      =============================== */}
-      <div style={{
-        display: "flex",
-        gap: "20px"
-      }}>
-
-        <ProfileCard 
-          nombre="Hector"
-          profesion="Frontend Developer"
-          foto={perfil}
-        />
-
-        <ProfileCard 
-          nombre="Juan"
-          profesion="Backend Developer"
-          foto={perfil}
-        />
-
-        <ProfileCard 
-          nombre="Maria"
-          profesion="UI Designer"
-          foto={perfil}
-        />
-
+      {/* TARJETAS */}
+      <div style={{ display: "flex", gap: "20px" }}>
+        <ProfileCard nombre="Hector" profesion="Frontend Developer" foto={perfil}/>
+        <ProfileCard nombre="Juan" profesion="Backend Developer" foto={perfil}/>
+        <ProfileCard nombre="Maria" profesion="UI Designer" foto={perfil}/>
       </div>
 
-
-      {/* ===============================
-          LISTA DE TAREAS (DÍA 3)
-      =============================== */}
+      {/* LISTA */}
       <div style={{ marginTop: "40px" }}>
-
-        <h2 style={{ textAlign: "center" }}>
-          Lista de tareas
-        </h2>
-
-        <ul style={{
-          listStyle: "none",
-          padding: 0,
-          width: "300px"
-        }}>
-
-          {/* Convertimos array → HTML */}
+        <h2>Lista de tareas</h2>
+        <ul style={{ listStyle: "none", padding: 0, width: "300px" }}>
           {tareas.map((tarea, index) => (
-            <li 
-              key={index}
-              style={{
-                backgroundColor: "white",
-                padding: "10px",
-                marginBottom: "10px",
-                borderRadius: "5px",
-                boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
-              }}
-            >
+            <li key={index} style={{
+              backgroundColor: "white",
+              padding: "10px",
+              marginBottom: "10px",
+              borderRadius: "5px"
+            }}>
               {tarea}
             </li>
           ))}
-
         </ul>
-
       </div>
 
-
-      {/* ===============================
-          CONTADOR (DÍA 4)
-      =============================== */}
+      {/* CONTADOR */}
       <div style={{ marginTop: "40px", textAlign: "center" }}>
-
         <h2>Contador</h2>
-
         <h1>{contador}</h1>
-
-        {/* Sumar */}
-        <button onClick={() => setContador(contador + 1)}>
-          +
-        </button>
-
-        {/* Restar */}
-        <button 
-          onClick={() => setContador(contador - 1)}
-          style={{ marginLeft: "10px" }}
-        >
-          -
-        </button>
-
-        {/* Resetear */}
-        <button 
-          onClick={() => setContador(0)} 
-          style={{ marginLeft: "10px"}}
-        >
-          Reset
-        </button>
-
+        <button onClick={() => setContador(contador + 1)}>+</button>
+        <button onClick={() => setContador(contador - 1)} style={{ marginLeft: "10px" }}>-</button>
+        <button onClick={() => setContador(0)} style={{ marginLeft: "10px" }}>Reset</button>
       </div>
 
-
-      {/* ===============================
-          🟡 FORMULARIO (DÍA 5)
-      =============================== */}
+      {/* FORMULARIO */}
       <div style={{ marginTop: "40px", textAlign: "center" }}>
-
         <h2>Formulario</h2>
 
-        {/* INPUT CONTROLADO */}
         <input 
           type="text"
           placeholder="Escribe tu nombre"
-
-          // React controla el valor
           value={nombre}
-
-          // Se ejecuta en cada tecla
           onChange={(e) => {
-
-            // Guardamos lo que escribe el usuario
             setNombre(e.target.value);
-
-            // ===============================
-            // VALIDACIÓN
-            // ===============================
             if (e.target.value === "") {
               setError("El nombre es obligatorio");
             } else {
               setError("");
             }
-
           }}
         />
 
-        {/* MENSAJE DE ERROR (CONDICIONAL) */}
-        {error && (
-          <p style={{ color: "red" }}>
-            {error}
-          </p>
-        )}
-
-        {/* MOSTRAR NOMBRE EN VIVO */}
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <p>Hola, {nombre}</p>
+      </div>
+
+      {/* HORA */}
+      <div style={{ marginTop: "40px", textAlign: "center" }}>
+        <h2>Hora actual</h2>
+        <h3>{hora.toLocaleTimeString()}</h3>
+      </div>
+
+      {/* 🔵 USUARIOS */}
+      <div style={{ marginTop: "40px", textAlign: "center" }}>
+        <h2>Usuarios</h2>
+
+        {/* 🔥 LOADING */}
+        {loading && <p>Cargando usuarios...</p>}
+
+        {/* 🔥 ERROR */}
+        {errorFetch && <p style={{ color: "red" }}>{errorFetch}</p>}
+
+        {/* 🔥 LISTA */}
+        {!loading && !errorFetch && (
+          <ul style={{ listStyle: "none", padding: 0, width: "300px" }}>
+            {usuarios.map((usuario) => (
+              <li key={usuario.id} style={{
+                backgroundColor: "white",
+                padding: "10px",
+                marginBottom: "10px",
+                borderRadius: "5px"
+              }}>
+                <strong>{usuario.name}</strong>
+                <br />
+                <small>{usuario.email}</small>
+              </li>
+            ))}
+          </ul>
+        )}
 
       </div>
 
@@ -211,6 +185,4 @@ function App() {
   );
 }
 
-
-// Exportación
 export default App;
