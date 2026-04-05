@@ -12,19 +12,24 @@ import perfil from "./assets/perfil.jpg";
 function App() {
 
   // ===============================
-  // 🔵 ESTADOS API
+  // 🔵 ESTADOS API (DÍA 7)
   // ===============================
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errorFetch, setErrorFetch] = useState(null); // 🔥 nuevo (manejo de error)
+  const [errorFetch, setErrorFetch] = useState(null);
 
   // ===============================
-  // 🟡 ESTADO HORA
+  // 🔵 BUSCADOR (DÍA 8)
+  // ===============================
+  const [busqueda, setBusqueda] = useState("");
+
+  // ===============================
+  // 🟡 HORA (DÍA 6)
   // ===============================
   const [hora, setHora] = useState(new Date());
 
   // ===============================
-  // DATOS FIJOS
+  // 📦 TAREAS (DÍA 3)
   // ===============================
   const tareas = [
     "Aprender React",
@@ -34,30 +39,27 @@ function App() {
   ];
 
   // ===============================
-  // ESTADOS UI
+  // 🟡 ESTADOS UI
   // ===============================
   const [contador, setContador] = useState(0);
   const [nombre, setNombre] = useState("");
   const [error, setError] = useState("");
 
   // ===============================
-  // 🟡 RELOJ
+  // 🟡 RELOJ (DÍA 6)
   // ===============================
   useEffect(() => {
-
     const intervalo = setInterval(() => {
       setHora(new Date());
     }, 1000);
 
     return () => clearInterval(intervalo);
-
   }, []);
 
   // ===============================
-  // 🔵 FETCH API (MEJORADO)
+  // 🔵 FETCH API (DÍA 7)
   // ===============================
   useEffect(() => {
-
     fetch("https://jsonplaceholder.typicode.com/users")
       .then((response) => {
         if (!response.ok) {
@@ -73,8 +75,41 @@ function App() {
         setErrorFetch(error.message);
         setLoading(false);
       });
-
   }, []);
+
+  // ===============================
+  // 🔵 FILTRO (DÍA 8)
+  // ===============================
+  const usuariosFiltrados = usuarios.filter((usuario) =>
+    usuario.name.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
+  // ===============================
+  // 🔥 RESALTAR TEXTO (MEJORADO)
+  // ===============================
+  function resaltarTexto(texto, busqueda) {
+
+    if (!busqueda) return texto;
+
+    // Escapar caracteres especiales
+    const escapeRegExp = (string) =>
+      string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    const regex = new RegExp(`(${escapeRegExp(busqueda)})`, "gi");
+
+    const partes = texto.split(regex);
+
+    return partes.map((parte, index) =>
+      parte.toLowerCase() === busqueda.toLowerCase()
+        ? (
+          <span key={index} style={{ backgroundColor: "yellow" }}>
+            {parte}
+          </span>
+        )
+        : parte
+    );
+  }
+
 
   // ===============================
   // UI
@@ -100,6 +135,7 @@ function App() {
       {/* LISTA */}
       <div style={{ marginTop: "40px" }}>
         <h2>Lista de tareas</h2>
+
         <ul style={{ listStyle: "none", padding: 0, width: "300px" }}>
           {tareas.map((tarea, index) => (
             <li key={index} style={{
@@ -118,6 +154,7 @@ function App() {
       <div style={{ marginTop: "40px", textAlign: "center" }}>
         <h2>Contador</h2>
         <h1>{contador}</h1>
+
         <button onClick={() => setContador(contador + 1)}>+</button>
         <button onClick={() => setContador(contador - 1)} style={{ marginLeft: "10px" }}>-</button>
         <button onClick={() => setContador(0)} style={{ marginLeft: "10px" }}>Reset</button>
@@ -133,6 +170,7 @@ function App() {
           value={nombre}
           onChange={(e) => {
             setNombre(e.target.value);
+
             if (e.target.value === "") {
               setError("El nombre es obligatorio");
             } else {
@@ -151,34 +189,41 @@ function App() {
         <h3>{hora.toLocaleTimeString()}</h3>
       </div>
 
-      {/* 🔵 USUARIOS */}
+      {/* 🔵 USUARIOS + BUSCADOR */}
       <div style={{ marginTop: "40px", textAlign: "center" }}>
         <h2>Usuarios</h2>
 
-        {/* 🔥 LOADING */}
-        {loading && <p>Cargando usuarios...</p>}
+        <input
+          type="text"
+          placeholder="Buscar usuario..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          style={{
+            marginBottom: "10px",
+            padding: "5px",
+            width: "300px"
+          }}
+        />
 
-        {/* 🔥 ERROR */}
+        {loading && <p>Cargando usuarios...</p>}
         {errorFetch && <p style={{ color: "red" }}>{errorFetch}</p>}
 
-        {/* 🔥 LISTA */}
         {!loading && !errorFetch && (
           <ul style={{ listStyle: "none", padding: 0, width: "300px" }}>
-            {usuarios.map((usuario) => (
+            {usuariosFiltrados.map((usuario) => (
               <li key={usuario.id} style={{
                 backgroundColor: "white",
                 padding: "10px",
                 marginBottom: "10px",
                 borderRadius: "5px"
               }}>
-                <strong>{usuario.name}</strong>
+                <strong>{resaltarTexto(usuario.name, busqueda)}</strong>
                 <br />
                 <small>{usuario.email}</small>
               </li>
             ))}
           </ul>
         )}
-
       </div>
 
     </div>
