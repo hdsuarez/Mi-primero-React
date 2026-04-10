@@ -3,6 +3,7 @@
 // ===============================
 import { useState, useEffect, useContext } from "react";
 import { ThemeContext } from "./context/ThemeContext";
+import useFetch from "./hooks/useFetch";
 import ProfileCard from "./components/ProfileCard";
 import perfil from "./assets/perfil.jpg";
 
@@ -18,11 +19,11 @@ function App() {
   const { theme, toggleTheme } = useContext(ThemeContext);
 
   // ===============================
-  // 🔵 ESTADOS API (DÍA 7)
+  // 🔵 CUSTOM HOOK (DÍA 10)
   // ===============================
-  const [usuarios, setUsuarios] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorFetch, setErrorFetch] = useState(null);
+  const { data: usuarios, loading, error: errorFetch } = useFetch(
+    "https://jsonplaceholder.typicode.com/users"
+  );
 
   // ===============================
   // 🔵 BUSCADOR (DÍA 8)
@@ -60,27 +61,6 @@ function App() {
     }, 1000);
 
     return () => clearInterval(intervalo);
-  }, []);
-
-  // ===============================
-  // 🔵 FETCH API (DÍA 7)
-  // ===============================
-  useEffect(() => {
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Error al cargar usuarios");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setUsuarios(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setErrorFetch(error.message);
-        setLoading(false);
-      });
   }, []);
 
   // ===============================
@@ -137,7 +117,7 @@ function App() {
 
       {/* 🌗 BOTÓN TEMA */}
       <button onClick={toggleTheme} style={{ marginBottom: "20px" }}>
-        Cambiar a modo {theme === "light" ? "oscuro" : "claro"}
+        {theme === "light" ? "🌙 Modo oscuro" : "☀️ Modo claro"}
       </button>
 
       {/* TARJETAS */}
