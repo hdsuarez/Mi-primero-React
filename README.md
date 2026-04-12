@@ -1,4 +1,30 @@
-# React + Vite
+# 🚀 Dashboard de Usuarios en React
+
+## 📌 Descripción
+Aplicación desarrollada con React que muestra un dashboard interactivo consumiendo una API externa.
+
+## 🧠 Tecnologías usadas
+- React
+- Context API
+- Custom Hooks
+- JavaScript
+- CSS
+
+## ⚙️ Funcionalidades
+- Cambio de tema (modo oscuro/claro)
+- Consumo de API (usuarios)
+- Buscador dinámico
+- Optimización de rendimiento con memo y hooks
+- Componentes reutilizables
+
+## 🎯 Objetivo
+Practicar desarrollo frontend moderno con buenas prácticas.
+
+## 📸 Vista previa
+(Aquí puedes luego subir una imagen)
+
+## 🔗 Autor
+Hector Suarez# React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

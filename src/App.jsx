@@ -1,60 +1,42 @@
 // ===============================
 // IMPORTACIONES
 // ===============================
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useMemo, useCallback } from "react";
 import { ThemeContext } from "./context/ThemeContext";
 import useFetch from "./hooks/useFetch";
 import ProfileCard from "./components/ProfileCard";
+import UserList from "./components/UserList";
+import DashboardLayout from "./components/layout/DashboardLayout";
+import Card from "./components/Card";
 import perfil from "./assets/perfil.jpg";
-
 
 // ===============================
 // COMPONENTE PRINCIPAL
 // ===============================
 function App() {
 
-  // ===============================
-  // 🌗 CONTEXTO GLOBAL (DÍA 9)
-  // ===============================
+  // 🌗 CONTEXTO GLOBAL
   const { theme, toggleTheme } = useContext(ThemeContext);
 
-  // ===============================
-  // 🔵 CUSTOM HOOK (DÍA 10)
-  // ===============================
+  // 🔵 API (custom hook)
   const { data: usuarios, loading, error: errorFetch } = useFetch(
     "https://jsonplaceholder.typicode.com/users"
   );
 
-  // ===============================
-  // 🔵 BUSCADOR (DÍA 8)
-  // ===============================
+  // 🔍 BUSCADOR
   const [busqueda, setBusqueda] = useState("");
 
-  // ===============================
-  // 🟡 HORA (DÍA 6)
-  // ===============================
+  // ⏰ RELOJ
   const [hora, setHora] = useState(new Date());
 
-  // ===============================
-  // 📦 TAREAS (DÍA 3)
-  // ===============================
-  const tareas = [
-    "Aprender React",
-    "Estudiar JavaScript",
-    "Hacer ejercicio",
-    "Trabajar en proyectos"
-  ];
+  // 📦 TAREAS
+  const tareas = ["Aprender React", "Estudiar JS", "Ejercicio", "Proyectos"];
 
-  // ===============================
-  // 🟡 ESTADOS UI
-  // ===============================
+  // 🎯 ESTADOS
   const [contador, setContador] = useState(0);
   const [nombre, setNombre] = useState("");
-  const [error, setError] = useState("");
 
-  // ===============================
-  // 🟡 RELOJ (DÍA 6)
-  // ===============================
+  // ⏱️ EFECTO RELOJ
   useEffect(() => {
     const intervalo = setInterval(() => {
       setHora(new Date());
@@ -63,165 +45,115 @@ function App() {
     return () => clearInterval(intervalo);
   }, []);
 
-  // ===============================
-  // 🔵 FILTRO (DÍA 8)
-  // ===============================
-  const usuariosFiltrados = usuarios.filter((usuario) =>
-    usuario.name.toLowerCase().includes(busqueda.toLowerCase())
-  );
+  // 🔥 FILTRO OPTIMIZADO
+  const usuariosFiltrados = useMemo(() => {
+    return usuarios.filter((u) =>
+      u.name.toLowerCase().includes(busqueda.toLowerCase())
+    );
+  }, [usuarios, busqueda]);
 
-  // ===============================
-  // 🔥 RESALTAR TEXTO
-  // ===============================
-  function resaltarTexto(texto, busqueda) {
+  // 🔥 FUNCIÓN MEMORIZADA
+  const resaltarTexto = useCallback((texto, busqueda) => {
 
     if (!busqueda) return texto;
 
-    const escapeRegExp = (string) =>
-      string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${busqueda})`, "gi");
 
-    const regex = new RegExp(`(${escapeRegExp(busqueda)})`, "gi");
-
-    const partes = texto.split(regex);
-
-    return partes.map((parte, index) =>
+    return texto.split(regex).map((parte, i) =>
       parte.toLowerCase() === busqueda.toLowerCase()
-        ? (
-          <span key={index} style={{ backgroundColor: "yellow" }}>
-            {parte}
-          </span>
-        )
+        ? <span key={i} style={{ background: "yellow" }}>{parte}</span>
         : parte
     );
-  }
 
-  // ===============================
-  // 🎨 ESTILOS DINÁMICOS (DÍA 9)
-  // ===============================
-  const estilos = {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    backgroundColor: theme === "light" ? "#f5f5f5" : "#121212",
-    color: theme === "light" ? "#000" : "#fff",
-    minHeight: "100vh",
-    padding: "40px"
-  };
+  }, []);
 
-  // ===============================
-  // UI
-  // ===============================
   return (
 
-    <div style={estilos}>
+    // 🔥 USO DEL LAYOUT
+    <DashboardLayout theme={theme}>
 
-      {/* 🌗 BOTÓN TEMA */}
-      <button onClick={toggleTheme} style={{ marginBottom: "20px" }}>
+      {/* HEADER */}
+      <h1>Dashboard de Usuarios</h1>
+      <p>Proyecto React con Context, Hooks y Optimización</p>
+
+      <div style={{ marginTop: "20px", maxWidth: "600px" }}>
+          <p>Este proyecto fue desarrollado con React aplicando conceptos como Context API, Custom Hooks, optimización de rendimiento y consumo de APIs.</p>
+      </div>
+
+      {/* BOTÓN TEMA */}
+      <button onClick={toggleTheme}>
         {theme === "light" ? "🌙 Modo oscuro" : "☀️ Modo claro"}
       </button>
 
-      {/* TARJETAS */}
-      <div style={{ display: "flex", gap: "20px" }}>
-        <ProfileCard nombre="Hector" profesion="Frontend Developer" imagen={perfil}/>
-        <ProfileCard nombre="Juan" profesion="Backend Developer" imagen={perfil}/>
-        <ProfileCard nombre="Maria" profesion="UI Designer" imagen={perfil}/>
+      {/* 🔥 CARDS RESUMEN */}
+      <div style={{
+        display: "flex",
+        gap: "20px",
+        flexWrap: "wrap",
+        marginTop: "20px"
+      }}>
+
+        <Card title="Usuarios" theme={theme}>
+          <p>{usuarios.length}</p>
+        </Card>
+
+        <Card title="Tareas" theme={theme}>
+          <p>{tareas.length}</p>
+        </Card>
+
+        <Card title="Contador" theme={theme}>
+          <p>{contador}</p>
+        </Card>
+
+        <Card title="Hora" theme={theme}>
+          <p>{hora.toLocaleTimeString()}</p>
+        </Card>
+
       </div>
 
-      {/* LISTA */}
-      <div style={{ marginTop: "40px" }}>
-        <h2>Lista de tareas</h2>
-
-        <ul style={{ listStyle: "none", padding: 0, width: "300px" }}>
-          {tareas.map((tarea, index) => (
-            <li key={index} style={{
-              backgroundColor: theme === "light" ? "white" : "#1e1e1e",
-              padding: "10px",
-              marginBottom: "10px",
-              borderRadius: "5px"
-            }}>
-              {tarea}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* CONTADOR */}
-      <div style={{ marginTop: "40px", textAlign: "center" }}>
-        <h2>Contador</h2>
-        <h1>{contador}</h1>
-
-        <button onClick={() => setContador(contador + 1)}>+</button>
-        <button onClick={() => setContador(contador - 1)} style={{ marginLeft: "10px" }}>-</button>
-        <button onClick={() => setContador(0)} style={{ marginLeft: "10px" }}>Reset</button>
+      {/* TARJETAS PERFIL */}
+      <div style={{ display: "flex", gap: "20px", marginTop: "40px" }}>
+        <ProfileCard nombre="Hector" profesion="Frontend" imagen={perfil}/>
+        <ProfileCard nombre="Juan" profesion="Backend" imagen={perfil}/>
       </div>
 
       {/* FORMULARIO */}
-      <div style={{ marginTop: "40px", textAlign: "center" }}>
-        <h2>Formulario</h2>
-
-        <input 
-          type="text"
-          placeholder="Escribe tu nombre"
-          value={nombre}
-          onChange={(e) => {
-            setNombre(e.target.value);
-
-            if (e.target.value === "") {
-              setError("El nombre es obligatorio");
-            } else {
-              setError("");
-            }
-          }}
-        />
-
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <p>Hola, {nombre}</p>
-      </div>
-
-      {/* HORA */}
-      <div style={{ marginTop: "40px", textAlign: "center" }}>
-        <h2>Hora actual</h2>
-        <h3>{hora.toLocaleTimeString()}</h3>
-      </div>
-
-      {/* USUARIOS */}
-      <div style={{ marginTop: "40px", textAlign: "center" }}>
-        <h2>Usuarios</h2>
-
+      <div style={{ marginTop: "40px" }}>
         <input
-          type="text"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          placeholder="Tu nombre"
+        />
+        <p>Hola {nombre}</p>
+      </div>
+
+      {/* CONTADOR */}
+      <div style={{ marginTop: "20px" }}>
+        <button onClick={() => setContador(contador + 1)}>Sumar</button>
+      </div>
+
+      {/* BUSCADOR */}
+      <div style={{ marginTop: "40px" }}>
+        <input
           placeholder="Buscar usuario..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          style={{
-            marginBottom: "10px",
-            padding: "5px",
-            width: "300px"
-          }}
         />
-
-        {loading && <p>Cargando usuarios...</p>}
-        {errorFetch && <p style={{ color: "red" }}>{errorFetch}</p>}
-
-        {!loading && !errorFetch && (
-          <ul style={{ listStyle: "none", padding: 0, width: "300px" }}>
-            {usuariosFiltrados.map((usuario) => (
-              <li key={usuario.id} style={{
-                backgroundColor: theme === "light" ? "white" : "#1e1e1e",
-                padding: "10px",
-                marginBottom: "10px",
-                borderRadius: "5px"
-              }}>
-                <strong>{resaltarTexto(usuario.name, busqueda)}</strong>
-                <br />
-                <small>{usuario.email}</small>
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
 
-    </div>
+      {/* ESTADOS */}
+      {loading && <p>Cargando...</p>}
+      {errorFetch && <p>{errorFetch}</p>}
+
+      {/* LISTA OPTIMIZADA */}
+      <UserList
+        usuarios={usuariosFiltrados}
+        busqueda={busqueda}
+        resaltarTexto={resaltarTexto}
+        theme={theme}
+      />
+
+    </DashboardLayout>
   );
 }
 
