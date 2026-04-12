@@ -20,8 +20,6 @@ Aplicación desarrollada con React que muestra un dashboard interactivo consumie
 ## 🎯 Objetivo
 Practicar desarrollo frontend moderno con buenas prácticas.
 
-## 📸 Vista previa
-(Aquí puedes luego subir una imagen)
 
 ## 🔗 Autor
 Hector Suarez# React + Vite
